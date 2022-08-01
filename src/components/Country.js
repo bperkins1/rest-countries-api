@@ -1,8 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
 
 function Country(props){
 
@@ -12,12 +8,9 @@ function Country(props){
 
   return (
 
-  	
-    <div onClick={handleClick}>
-
-          	<div className="col">
-	          	<div className="card h-100">
-	          		<img src={props.flag} className="card-img-top" alt=""/>
+	   <div className="col"  onClick={handleClick}>
+	     <div className="card h-100">
+	      	<img src={props.flag} className="card-img-top" alt=""/>
 				  <div className="card-body">
 				  	<div className="card-title">
 				  		{props.name}
@@ -27,10 +20,7 @@ function Country(props){
 				    <p>Capital {props.capital}</p>
 				  </div>
 				</div>
-   
-   
-        </div>
-    </div>
+      </div>
   );
 }
 

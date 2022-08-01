@@ -1,26 +1,26 @@
 import React from "react";
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
+
+function Header(props) {
 
 
-
-function Header() {
+	function handleClick(){
+		props.toggleMode()
+	}
 	return (
-	<div className="row">
+	<div className="row p-4 header-bg border-bottom shadow-lg">
 
-		<div className="col-6">
+		<div className="col-10">
 			<h1>Where in the world?</h1>
 		</div>
 
-		<div className="col-6 justify-content-end">
-			<DarkModeIcon />
-			<p>Dark Mode</p>
-		</div>
-		
+			<div onClick={handleClick} className="col-1 d-flex justify-content-end">
+				{props.dark ? <DarkModeIcon /> : <LightModeIcon />}
+			</div>
+			<div onClick={handleClick} className="col-1">
+				<p>Dark Mode</p>
+			</div>
 	</div>
 	)
 };

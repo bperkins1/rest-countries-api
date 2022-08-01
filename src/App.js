@@ -20,6 +20,9 @@ const [region, setRegion] =useState('');
 // state for handling detailed display
 const [detail, setDetail] = useState(false);
 
+// state for handling dark mod
+const [dark, setDark] = useState(false);
+
   // the API call
   useEffect(() => {
     fetch('https://restcountries.com/v3.1/all')
@@ -86,25 +89,37 @@ function onNavigate(event){
   console.log(countries)
 }
 
+function toggleMode(){
+  setDark(!dark);
+}
+
   return (
 
 
-    <div className="container-fluid p-0">
-      <Header />
+    <div>
+      <Header toggleMode={toggleMode} dark={dark}/>
+    <div className="container-fluid border-top px-5">
+      <div className="row py-5">
+        <div className="col-sm-4 my-1">
 
       {countries && !detail &&
               <CountrySelect onCountryChange={changeCountry}  countries={data.map(country => country.name.common)}/>
       }
-
+        </div>
+        <div className="col-sm-5">
+        </div>
+        <div className="col-sm-3 my-1">
       {!detail && <RegionBox onRegionChange={changeRegion}/>
       }
+        </div>
       {loading && <div>A moment please...</div>}
 
       {error && (
         <div>{`There is a problem fetching the post data - ${error}`}</div>
       )}
 
-        <div className="row row-cols-1 row-cols-md-4 g-3">
+      </div>
+        <div className="row row-cols-1 row-cols-md-4 g-5">
 
 {/*if no countries, dont display. if the length of countries == 1 then display a detailed version. 
 else display all of them*/}
@@ -145,7 +160,7 @@ else display all of them*/}
       }
 
         </div>
-
+        </div>
     </div>  
   );
 }
