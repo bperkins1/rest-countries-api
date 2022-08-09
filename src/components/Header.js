@@ -1,6 +1,8 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
+
 
 function Header(props) {
 
@@ -9,18 +11,18 @@ function Header(props) {
 		props.toggleMode()
 	}
 	return (
-	<div className="row p-4 header-bg border-bottom shadow-lg">
+	<div className="d-flex flex-wrap p-4 align-items-center justify-content-between header-bg border-bottom shadow-lg">
 
-		<div className="col-10">
-			<h1>Where in the world?</h1>
-		</div>
+			<h1 className="d-flex">Where in the world?</h1>
+		
 
-			<div onClick={handleClick} className="col-1 d-flex justify-content-end">
-				{props.dark ? <DarkModeIcon /> : <LightModeIcon />}
-			</div>
-			<div onClick={handleClick} className="col-1">
-				<p>Dark Mode</p>
-			</div>
+			<span onClick={handleClick} className="">
+				{props.mode === "light" ? <LightModeIcon /> : <DarkModeIcon />}
+				<span className="mode-text mx-4">Dark Mode</span>
+			</span>
+			
+				
+			
 	</div>
 	)
 };

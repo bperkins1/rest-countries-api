@@ -1,27 +1,32 @@
 import React, {useState, useEffect} from 'react';
+import ReactDOM from "react-dom";
 import Header from './components/Header'
 import CountrySelect from './components/Search'
 import RegionBox from './components/Filter'
 import Country from './components/Country'
-import CountyContainer from './components/CountryContainer'
 import DetailedCountry from './components/DetailedCountry'
 
 function App() {
 
 // states for handling API call
-const [data, setData] = useState(null);
+const [data, setData] = useState([]);
 const [loading, setLoading] = useState(true);
 const [error, setError] = useState(null);
 
 // states for handling country display
-const [countries, setCountries] = useState(null);
-const [region, setRegion] =useState('');
+const [countries, setCountries] = useState([]);
+const [filter, setFilter] = useState({region: '', specified: ''})
 
 // state for handling detailed display
-const [detail, setDetail] = useState(false);
+const [detail, setDetail] = useState({'display': false, 'country': {}});
 
-// state for handling dark mod
-const [dark, setDark] = useState(false);
+// state for handling dark mode
+const [mode, setMode] = useState("light");
+
+// state for tracking scroll position
+const [pos, setPos] = useState({'pos': 0});
+
+const regionlist = ['Africa', 'Americas', 'Asia', 'Europe', 'Oceania']
 
   // the API call
   useEffect(() => {
@@ -49,69 +54,79 @@ const [dark, setDark] = useState(false);
   }, []);
 
 
-// When a region is selected, take region from Filter.js and set display to countries in that region. 
-// If none display all countries
-function changeRegion(value) {
-  if (value){
-    setCountries(data.filter(country => country.region == value)
-    )
-  }
-  else {
-    setCountries(data)
-  }
-}
+//when either input is changed, update filters and setcountries to show those that meet both filters.
+function changeFilter(value, type){
 
-// When a country is selected, display that country. When unselected, display default
-function changeCountry(value){
-  if (value){
-    setCountries(data.filter(country => country.name.common == value))
-  }
-  else{
-    setCountries(data)
-  }
+  setFilter(prevValue => {
+    if (regionlist.includes(value)) {
+      return {
+        region: value,
+        specified: prevValue.specified
+      };
+    } else if (!value) {
+      // this nested block handles the "X" button on each input. Type just holds which input the change is from.
+        if (type == 0) {
+          return {
+            region: prevValue.region,
+            specified: ''
+          }
+        } else if (type == 1) {
+          return {
+            region: '',
+            specified: prevValue.specified
+          }
+        }
+    } else {
+       return {
+        region: prevValue.region,
+        specified: value
+      }
+    }
+     
+  } )
+
 }
 
 // When a country is clicked, set country display to only that one
 function displayOne(name){
-  setDetail(true)
-  setCountries(countries.filter(country => country.name.common == name))
+  setPos({'pos': window.pageYOffset});
+  setDetail({'display': true, 'country': data.find(country => country.name.common == name)})
 }
 
-// return to default display states
+// return to all country display
 function displayAll(){
-  setDetail(false)
-  setCountries(data)
+  setDetail({'display': false, 'country':{} })
 }
 
 // navigate to country through border buttons
 function onNavigate(event){
-  setCountries(data.filter(country => country.name.common == event.target.value)) 
-  console.log(countries)
+  setDetail({'display': true, 'country': data.find(country => country.name.common == event.target.value)}) 
 }
 
 function toggleMode(){
-  setDark(!dark);
+  setMode((current) => (current === "light" ? "dark" : "light"));
 }
 
   return (
 
 
-    <div>
-      <Header toggleMode={toggleMode} dark={dark}/>
+    <div className="whole-view" id={mode}>
+      <Header toggleMode={toggleMode} mode={mode}/>
     <div className="container-fluid border-top px-5">
-      <div className="row py-5">
-        <div className="col-sm-4 my-1">
 
-      {countries && !detail &&
-              <CountrySelect onCountryChange={changeCountry}  countries={data.map(country => country.name.common)}/>
+      <div className="row d-flex justify-content-evenly py-5 px-0">
+        <div className="col my-1 d-flex justify-content-evenly">
+
+      {countries && !detail.display &&
+          <CountrySelect onCountryChange={changeFilter} default={filter.specified} countries={data.map(country => country.name.common)}/>
       }
         </div>
-        <div className="col-sm-5">
-        </div>
-        <div className="col-sm-3 my-1">
-      {!detail && <RegionBox onRegionChange={changeRegion}/>
+ 
+        <div className="col my-1 d-flex justify-content-evenly px-0">
+      {countries && !detail.display && <RegionBox default={filter.region} onRegionChange={changeFilter}/>
       }
         </div>
+
       {loading && <div>A moment please...</div>}
 
       {error && (
@@ -119,23 +134,24 @@ function toggleMode(){
       )}
 
       </div>
-        <div className="row row-cols-1 row-cols-md-4 g-5">
 
-{/*if no countries, dont display. if the length of countries == 1 then display a detailed version. 
-else display all of them*/}
+{/*display detailed country or all of them depending on state of detail*/}
 
-       { !countries ? null
-        : detail ? <DetailedCountry
+       { detail.display ? <DetailedCountry
+          position={pos}
           onBack={displayAll}
-          flag={countries[0].flags.png}
-          name={countries[0].name.common}
-          native={countries[0].name.native}
-          population={countries[0].population}
-          region={countries[0].region}
-          subregion={countries[0].subregion}
-          capital={countries[0].capital}
+          flag={detail.country.flags.png}
+          name={detail.country.name.common}
+          native={Object.values(detail.country.name.nativeName)[0].official}
+          population={detail.country.population}
+          region={detail.country.region}
+          subregion={detail.country.subregion}
+          capital={detail.country.capital}
+          domain={detail.country.tld}
+          languages={detail.country.languages}
+          currencies={detail.country.currencies}
           onNavigate={onNavigate}
-          borders={countries[0].borders ? countries[0].borders.map(code => data.find(country => country.cca3 == code).name.common)
+          borders={detail.country.borders ? detail.country.borders.map(code => data.find(country => country.cca3 == code).name.common)
             : null
           } 
           // If the country has borders info, borders returns array of bordering countries in cca3 format.
@@ -143,23 +159,29 @@ else display all of them*/}
 
           />
 
-        : countries.map((country, index) => {
-          return (
-            <Country
-              key={index}
-              flag={country.flags.png}
-              name={country.name.common}
-              population={country.population}
-              region={country.region}
-              capital={country.capital}
-              onCountryClick={displayOne}
-            />
-            )
-        })
+        :
 
-      }
+        <div className="row row-cols-1 row cols-sm-2 row-cols-md-3 row-cols-lg-4 g-5">
 
+          {/*display the country IF: it's (region is selected or no region is selected) AND (its name == selected name OR there is no name selected)*/}
+          {countries.map((country, index) => {
+            if ((!filter.region || filter.region == country.region) && (filter.specified == country.name.common || !filter.specified)){
+              return (
+                <Country
+                  position={pos}
+                  key={index}
+                  flag={country.flags.png}
+                  name={country.name.common}
+                  population={country.population}
+                  region={country.region}
+                  capital={country.capital}
+                  onCountryClick={displayOne}
+                />
+                )
+            }
+          })}
         </div>
+        }
         </div>
     </div>  
   );

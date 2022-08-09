@@ -1,4 +1,5 @@
 import * as React from 'react';
+import ReactDOM from "react-dom";
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 
@@ -6,7 +7,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 function RegionBox(props) {
 
   function handleChange(event, value) {
-    props.onRegionChange(value)  
+    props.onRegionChange(value, 1)  
   } 
 
 
@@ -14,11 +15,13 @@ function RegionBox(props) {
   return (
     <Autocomplete
       onChange={handleChange}
+      defaultValue={props.default}
       disablePortal
       id="combo-box-demo"
       options={regions}
       sx={{ width: 300 }}
-      renderInput={(params) => <TextField {...params} label="Filter by region" />}
+
+      renderInput={(params) => <TextField {...params} label="Filter by region"/>}
     />
   );
 }

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import ReactDOM from "react-dom";
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -8,12 +9,13 @@ import Autocomplete from '@mui/material/Autocomplete';
 function CountrySelect(props) {
 
   function handleChange(event, value){
-    props.onCountryChange(value)
+    props.onCountryChange(value, 0)
   }
 
   return (
       <Autocomplete
       onChange={handleChange}
+      defaultValue={props.default}
       disablePortal
       id="combo-box-demo"
       options={props.countries}
